@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Replit Remote Runner</title>
+  <style>
+    .replit-runner {
+      position: relative;
+      width: 100%;
+      height: 500px;
+    }
+    #runBtn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50; /* Hijau */
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    #runBtn.running {
+      background-color: #9E9E9E; /* Abu-abu */
+    }
+  </style>
+</head>
+<body>
+  <div class="replit-runner">
+    <iframe 
+      id="replitFrame" 
+      src="https://embed.replit.com/@khalidkordoba/simple-cms?embed=true" 
+      width="100%" 
+      height="100%"
+    ></iframe>
+    <button id="runBtn">Run</button>
+  </div>
+
+  <script>
+    const runBtn = document.getElementById('runBtn');
+    const replitFrame = document.getElementById('replitFrame');
+    let isRunning = false;
+
+    // Fungsi untuk menjalankan repl
+    async function runReplit() {
+      if(isRunning) return;
+      
+      runBtn.textContent = "Running...";
+      runBtn.disabled = true;
+      
+      try {
+        // Gunakan Replit Runtime API
+        const response = await fetch('https://replit.com/data/repls/@khalidkordoba/simple-cms/start', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
+        
+        if(response.ok) {
+          isRunning = true;
+          runBtn.classList.add('running');
+          runBtn.textContent = "Running";
+          
+          // Refresh iframe setelah 5 detik
+          setTimeout(() => {
+            replitFrame.src = replitFrame.src;
+          }, 5000);
+        }
+      } catch(err) {
+        console.error('Error:', err);
+        alert('Gagal menjalankan Replit');
+      } finally {
+        runBtn.disabled = false;
+      }
+    }
+
+    runBtn.addEventListener('click', runReplit);
+  </script>
+</body>
+</html>
